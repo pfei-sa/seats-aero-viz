@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "seats-aero-viz"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "seats_aero_viz"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pydantic = "^1.10.7"
+altair = "^4.2.2"
+requests = "^2.28.2"
+pandas = "^1.5.3"
+streamlit = "^1.20.0"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.22.0"
+black = "^23.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
