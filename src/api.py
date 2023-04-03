@@ -2,9 +2,20 @@ import json
 from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
-from typing import Dict, List
+from typing import Dict, List, Set
 
 import requests
+
+PARTNERS = [
+    "lifemiles",
+    "aeromexico",
+    "american",
+    "united",
+    "delta",
+    "emirates",
+    "etihad",
+    "virginatlantic",
+]
 
 
 @dataclass
@@ -135,6 +146,16 @@ class Availability:
         raw = getattr(self, f"{code.lower()}_airlines")
         return raw if raw is not None else ""
 
+    def all_airlines(self) -> Set[str]:
+        res = set()
+        for code in ["Y", "W", "J", "F"]:
+            res.update(
+                airline.strip()
+                for airline in self.airlines(code).split(",")
+                if airline.strip() != ""
+            )
+        return res
+
     @staticmethod
     def from_dict(d: Dict) -> "Availability":
         raw = d
@@ -174,15 +195,14 @@ class Availability:
         return Availability.from_dict(json.loads(json_str))
 
     @staticmethod
-    @lru_cache(maxsize=1)
-    def fetch() -> List["Availability"]:
-        url = "https://seats.aero/api/availability"
+    def fetch(partner: str = "lifemiles") -> List["Availability"]:
+        url = f"https://seats.aero/api/availability?source={partner}"
         response = requests.get(url)
         all_availabilities = json.loads(response.text)
         return [
             Availability.from_dict(availability) for availability in all_availabilities
         ]
-    
+
     def airline_str(self) -> str:
         return "\n".join(
             [
@@ -191,11 +211,9 @@ class Availability:
                 if self.airlines(code)
             ]
         )
-    
+
     def fare_code_str(self) -> str:
-        return " ".join(
-            code for code in ["Y", "J", "F"] if self.available(code)
-        )
+        return " ".join(code for code in ["Y", "J", "F"] if self.available(code))
 
     def route_str(self) -> str:
         return f"{self.route.origin_airport} -> {self.route.destination_airport}"

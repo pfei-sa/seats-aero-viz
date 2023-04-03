@@ -3,24 +3,56 @@ from typing import List, Tuple
 
 import streamlit as st
 
-from src.api import Availability
+from src.api import Availability, PARTNERS
 from src.plot import plot_route
+from datetime import datetime as time
 
 
-@st.cache_data
-def load_availabilities(time: datetime) -> Tuple[List[Availability], datetime]:
-    return Availability.fetch(), time.now()
+with st.sidebar:
+    st.title("Partners")
+    partner = st.radio(
+        "Partners",
+        PARTNERS,
+        index=PARTNERS.index("lifemiles"),
+        label_visibility="hidden",
+    )
 
-st.title("Aero Seats Availability Visualizer")
 
-col1, col2 = st.columns([5, 1])
+@st.cache_data(ttl=timedelta(minutes=15))
+def load_availabilities(partner: str) -> Tuple[List[Availability], datetime]:
+    return Availability.fetch(partner), time.now()
+
+
+st.title("✈️Aero Seats Availability Visualizer")
+
+availabilities, cache_freshness = load_availabilities(partner)
+
+all_fares = ["Y", "W", "F", "J"]
+all_airlines = set()
+for a in availabilities:
+    for fare in all_fares:
+        all_airlines.update(
+            f.strip() for f in a.airlines(fare).split(",") if f.strip() != ""
+        )
+
+route = st.text_input("Route", "JFK -> HND -> BKK -> NRT, HND -> JFK")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    airlines = st.multiselect(
+        "Airlines to include (e.g. UA)",
+        all_airlines,
+    )
+
+with col2:
+    fares = st.multiselect(
+        "Fares to include (e.g. J)",
+        all_fares,
+    )
 
 
 def canonicalize_route(route: str) -> List[Tuple[str, str]]:
-    """
-    >>> canonicalize_route("JFK -> HND -> BKK,HND -> JFK")
-    'JFK -> HND, HND -> BKK, HND -> JFK'
-    """
     route = route.replace(" ", "")
     segs = route.split(",")
     res = []
@@ -29,29 +61,13 @@ def canonicalize_route(route: str) -> List[Tuple[str, str]]:
         res.extend([(org, dest) for org, dest in zip(stops[:-1], stops[1:])])
     return res
 
-# Force cache refresh every 15 minutes by setting the cache key to
-# the current time rounded down to the nearest 15 minutes.
-clamped_time = datetime.now().replace(second=0, microsecond=0)
-excess = clamped_time.minute % 15
-clamped_time -= timedelta(minutes=excess)
 
-availabilities, cache_freshness = load_availabilities(clamped_time)
-
-route = st.text_input("Route", "JFK -> HND -> BKK -> HND -> JFK")
-
-route_to_plot = [
-    "JFK",
-    "HND",
-    "BKK",
-    "HND",
-    "JFK",
-]
 st.caption(f"Last data refresh: {cache_freshness}")
 st.altair_chart(
     plot_route(
-        availabilities, canonicalize_route(route), airline="NH", class_code="J"
+        availabilities, canonicalize_route(route), airlines, fares
     ).interactive(),
     use_container_width=True,
-    theme=None
+    theme=None,
 )
 # %%
