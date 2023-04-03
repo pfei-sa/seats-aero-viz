@@ -7,6 +7,10 @@ from src.api import Availability, PARTNERS
 from src.plot import plot_route
 from datetime import datetime as time
 
+st.set_page_config(
+    page_title="Seats.aero Availability Visualizer",
+    page_icon=":airplane:",
+)
 
 with st.sidebar:
     st.title("Partners")
@@ -23,7 +27,7 @@ def load_availabilities(partner: str) -> Tuple[List[Availability], datetime]:
     return Availability.fetch(partner), time.now()
 
 
-st.title("✈️Aero Seats Availability Visualizer")
+st.title("✈️Seats.areo Availability Visualizer")
 
 availabilities, cache_freshness = load_availabilities(partner)
 
@@ -70,4 +74,3 @@ st.altair_chart(
     use_container_width=True,
     theme=None,
 )
-# %%
