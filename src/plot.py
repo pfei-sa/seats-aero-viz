@@ -27,18 +27,20 @@ def plot_route(
     res = []
     for org, dest in canonical_route:
         for availability in avail_dict[(org, dest)]:
-            res.append(
-                {
-                    "date": availability.parsed_date,
-                    "route": availability.route_str(),
-                    "airlines": availability.airline_str(),
-                    "fare": availability.fare_code_str(),
-                    "all_airlines": availability.all_airlines(),
-                    "freshness": availability.computed_last_seen,
-                }
-            )
+            for fare in ["Y", "W", "F", "J"]:
+                if not availability.available(fare):
+                    continue
+                res.append(
+                    {
+                        "date": availability.parsed_date,
+                        "route": availability.route_str(),
+                        "airlines": availability.airlines(fare),
+                        "fare": fare,
+                        "freshness": availability.computed_last_seen,
+                    }
+                )
     if len(airlines_set) > 0:
-        res = [r for r in res if len(r["all_airlines"] & airlines_set) > 0]
+        res = [r for r in res if len(set(r["airlines"].split(",")) & airlines_set) > 0]
     if len(class_code_set) > 0:
         res = [r for r in res if len(set(r["fare"].split(" ")) & class_code_set) > 0]
     df = pd.DataFrame(res, columns=["date", "route", "airlines", "fare", "freshness"])
@@ -47,18 +49,31 @@ def plot_route(
         .mark_circle(size=90)
         .encode(
             y=alt.Y(
-                "route",
-                scale=alt.Scale(
-                    domain=[f"{org} -> {dest}" for org, dest in canonical_route]
-                ),
-                sort=[f"{org} -> {dest}" for org, dest in canonical_route],
+                "fare",
+                axis=None,
             ),
             x=alt.X(
                 "date:T",
                 axis=alt.Axis(format="%Y-%m-%d"),
                 scale=alt.Scale(zero=False, clamp=True, nice=True),
             ),
-            color="fare",
+            color=alt.Color(
+                "fare",
+                legend=alt.Legend(
+                    orient="top",
+                ),
+                title="Fare",
+                scale=alt.Scale(
+                    domain=["Y", "W", "J", "F"],
+                    range=["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"],
+                ),
+            ),
             tooltip=["airlines", "fare", "date", "freshness"],
+            row=alt.Row(
+                "route",
+                sort=[f"{org} -> {dest}" for org, dest in canonical_route],
+                header=alt.Header(labelAngle=0, labelAlign="left", labelFontSize=14),
+                title=None,
+            ),
         )
     )
