@@ -3,9 +3,10 @@ from typing import List, Tuple
 
 import streamlit as st
 import humanize
+import altair as alt
 
 from src.api import Availability, PARTNERS
-from src.plot import plot_route
+from src.plot import get_route_df
 from datetime import datetime as time
 
 st.set_page_config(
@@ -71,11 +72,50 @@ def canonicalize_route(route: str) -> List[Tuple[str, str]]:
 
 time_since_cache = time.now() - cache_freshness
 
+route_df = get_route_df(availabilities, canonicalize_route(route), airlines, fares)
+
+chart = (
+    alt.Chart(route_df)
+    .mark_circle(size=90)
+    .encode(
+        y=alt.Y(
+            "fare",
+            axis=None,
+        ),
+        x=alt.X(
+            "date:T",
+            axis=alt.Axis(format="%Y-%m-%d"),
+            scale=alt.Scale(zero=False, clamp=True, nice=True),
+        ),
+        color=alt.Color(
+            "fare",
+            legend=alt.Legend(
+                orient="top",
+            ),
+            title="Fare",
+            scale=alt.Scale(
+                domain=["Y", "W", "J", "F"],
+                range=["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"],
+            ),
+        ),
+        tooltip=["airlines", "fare", "date", "freshness"],
+        row=alt.Row(
+            "route",
+            sort=[f"{org} -> {dest}" for org, dest in canonicalize_route(route)],
+            header=alt.Header(labelAngle=0, labelAlign="left", labelFontSize=14),
+            title=None,
+        ),
+    )
+)
+
 st.caption(f"Data last refreshed {humanize.naturaldelta(time_since_cache)} ago")
 st.altair_chart(
-    plot_route(
-        availabilities, canonicalize_route(route), airlines, fares
-    ).interactive(),
+    chart,
     use_container_width=True,
     theme=None,
 )
+
+for org, dest in canonicalize_route(route):
+    seg_str = f"{org} -> {dest}"
+    if seg_str not in route_df["route"].unique():
+        st.warning(f"No availability found for {seg_str}")
