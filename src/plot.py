@@ -34,13 +34,14 @@ def plot_route(
                     "airlines": availability.airline_str(),
                     "fare": availability.fare_code_str(),
                     "all_airlines": availability.all_airlines(),
+                    "freshness": availability.computed_last_seen,
                 }
             )
     if len(airlines_set) > 0:
         res = [r for r in res if len(r["all_airlines"] & airlines_set) > 0]
     if len(class_code_set) > 0:
         res = [r for r in res if len(set(r["fare"].split(" ")) & class_code_set) > 0]
-    df = pd.DataFrame(res, columns=["date", "route", "airlines", "fare"])
+    df = pd.DataFrame(res, columns=["date", "route", "airlines", "fare", "freshness"])
     return (
         alt.Chart(df)
         .mark_circle(size=90)
@@ -58,6 +59,6 @@ def plot_route(
                 scale=alt.Scale(zero=False, clamp=True, nice=True),
             ),
             color="fare",
-            tooltip=["airlines", "fare", "date"],
+            tooltip=["airlines", "fare", "date", "freshness"],
         )
     )
