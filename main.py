@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from typing import List, Tuple
 
 import streamlit as st
+import humanize
 
 from src.api import Availability, PARTNERS
 from src.plot import plot_route
@@ -66,7 +67,9 @@ def canonicalize_route(route: str) -> List[Tuple[str, str]]:
     return res
 
 
-st.caption(f"Last data refresh: {cache_freshness}")
+time_since_cache = time.now() - cache_freshness
+
+st.caption(f"Data last refreshed {humanize.naturaldelta(time_since_cache)} ago")
 st.altair_chart(
     plot_route(
         availabilities, canonicalize_route(route), airlines, fares
