@@ -6,10 +6,10 @@ Booking a multi-segment flight can be a pain. Checking the availability of seats
 
 # [✈️Try Now!✈️](https://seats-aero-viz.streamlit.app/)
 
-> ## Screenshot
+## Screenshot
 > ![image](https://user-images.githubusercontent.com/4657356/229388059-0fd8181d-dd2e-47d5-9f11-e0f3224cf4f4.png)
 
-# Running Locally
+## Running Locally
 
 - Clone the repo
 - Install the requirements using `poetry install`
