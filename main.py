@@ -41,8 +41,11 @@ for a in availabilities:
             f.strip() for f in a.airlines(fare).split(",") if f.strip() != ""
         )
 
+if "route" not in st.session_state:
+    st.session_state.route = "JFK -> HND -> BKK -> NRT, HND -> JFK"
+
 route = st.text_input(
-    "Route", "JFK -> HND -> BKK -> NRT, HND -> JFK", max_chars=100, key="route"
+    "Route", max_chars=100, key="route"
 ).upper()
 
 col1, col2 = st.columns(2)
