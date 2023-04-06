@@ -42,7 +42,7 @@ for a in availabilities:
         )
 
 route = st.text_input(
-    "Route", "JFK -> HND -> BKK -> NRT, HND -> JFK", max_chars=100
+    "Route", "JFK -> HND -> BKK -> NRT, HND -> JFK", max_chars=100, key="route"
 ).upper()
 
 col1, col2 = st.columns(2)
