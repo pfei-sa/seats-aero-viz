@@ -137,6 +137,7 @@ chart = (
             sort=[f"{org} -> {dest}" for org, dest in canonicalized_route],
             header=alt.Header(labelAngle=0, labelAlign="left", labelFontSize=14),
             title=None,
+            spacing=-10,
         ),
     )
 )
