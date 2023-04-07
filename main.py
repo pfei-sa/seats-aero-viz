@@ -135,7 +135,7 @@ chart = (
         row=alt.Row(
             "route",
             sort=[f"{org} -> {dest}" for org, dest in canonicalized_route],
-            header=alt.Header(labelAngle=0, labelAlign="left", labelFontSize=14),
+            header=alt.Header(labelAngle=0, labelAlign="left", labelFontSize=14, labelFont="monospace"),
             title=None,
             spacing=-10,
         ),
