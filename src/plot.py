@@ -1,7 +1,6 @@
 from collections import defaultdict
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
-import altair as alt
 import pandas as pd
 
 from src.api import Availability
@@ -37,11 +36,20 @@ def get_route_df(
                         "airlines": availability.airlines(fare),
                         "fare": fare,
                         "freshness": availability.computed_last_seen,
+                        "direct": availability.direct(fare),
                     }
                 )
     if len(airlines_set) > 0:
-        res = [r for r in res if len(set(r["airlines"].split(",")) & airlines_set) > 0]
+        res = [
+            r
+            for r in res
+            if len(
+                set(airline.strip() for airline in r["airlines"].split(","))
+                & airlines_set
+            )
+            > 0
+        ]
     if len(class_code_set) > 0:
         res = [r for r in res if len(set(r["fare"].split(" ")) & class_code_set) > 0]
-    df = pd.DataFrame(res, columns=["date", "route", "airlines", "fare", "freshness"])
+    df = pd.DataFrame(res)
     return df

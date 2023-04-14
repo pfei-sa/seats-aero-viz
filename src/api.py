@@ -17,6 +17,18 @@ PARTNERS = [
     "virginatlantic",
 ]
 
+def partner_to_display_name(partner: str) -> str:
+    return {
+        "lifemiles": "LifeMiles",
+        "aeromexico": "Aeromexico",
+        "american": "American Airlines",
+        "united": "United Airlines",
+        "delta": "Delta Airlines",
+        "emirates": "Emirates",
+        "etihad": "Etihad",
+        "virginatlantic": "Virgin Atlantic",
+    }[partner]
+
 
 @dataclass
 class Route:
@@ -145,6 +157,10 @@ class Availability:
     def airlines(self, code: str) -> str:
         raw = getattr(self, f"{code.lower()}_airlines")
         return raw if raw is not None else ""
+    
+    def direct(self, code: str) -> bool:
+        raw = getattr(self, f"{code.lower()}_direct")
+        return raw if raw is not None else False
 
     def all_airlines(self) -> Set[str]:
         res = set()
