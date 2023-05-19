@@ -5,7 +5,7 @@ description = ""
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 packages = [
-    { include = "seats_aero", from = "src" },
+    { include = "seats_aero" },
 ]
 
 [tool.poetry.dependencies]

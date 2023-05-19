@@ -7,9 +7,9 @@ import humanize
 import altair as alt
 import pandas as pd
 
-from src.api import Availability, PARTNERS, partner_to_display_name
-from src.plot import get_route_df
-from src.airport import city_expansion_dict, country_expansion_dict
+from seats_aero.api import Availability, PARTNERS, partner_to_display_name
+from seats_aero.plot import get_route_df
+from seats_aero.airport import city_expansion_dict, country_expansion_dict
 from datetime import datetime as time
 
 st.set_page_config(

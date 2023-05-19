@@ -3,7 +3,7 @@ from typing import Dict, List, Tuple
 
 import pandas as pd
 
-from src.api import Availability
+from seats_aero.api import Availability
 
 
 def get_route_df(
