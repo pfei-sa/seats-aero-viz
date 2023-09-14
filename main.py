@@ -50,7 +50,7 @@ for a in availabilities:
         )
 
 route = st.text_input(
-    "Route", "US -> LHR -> NYC, CA -> HKG", max_chars=300, key="route"
+    "Route", "US - LHR - NYC, CA - HKG", max_chars=300, key="route"
 ).upper()
 
 col1, col2, col3 = st.columns([3, 3, 2])
@@ -83,11 +83,11 @@ with col3:
 def canonicalize_route(
     route: str, expand_country: bool = False, expand_city: bool = False
 ) -> List[Tuple[str, str]]:
-    route = route.replace(" ", "")
+    route = route.replace(" ", "").replace("->", "-")
     segs = route.split(",")
     res = []
     for seg in segs:
-        stops = seg.split("->")
+        stops = seg.split("-")
         res.extend([(org, dest) for org, dest in zip(stops[:-1], stops[1:])])
     return expand_route(res, expand_country, expand_city)
 
