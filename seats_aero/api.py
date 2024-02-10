@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
 from typing import Dict, List, Set
+from streamlit import secrets
 
 import requests
 
@@ -62,7 +63,9 @@ class Route:
     @staticmethod
     def fetch() -> List["Route"]:
         url = "https://seats.aero/api/routes"
-        response = requests.get(url)
+        response = requests.get(url, headers={
+            "Partner-Authorization": secrets["api_key"]
+        })
         all_routes = json.loads(response.text)
         return [Route.from_dict(route) for route in all_routes]
 
@@ -213,7 +216,9 @@ class Availability:
     @staticmethod
     def fetch(partner: str = "lifemiles") -> List["Availability"]:
         url = f"https://seats.aero/api/availability?source={partner}"
-        response = requests.get(url)
+        response = requests.get(url, headers={
+            "Partner-Authorization": secrets["api_key"]
+        })
         all_availabilities = json.loads(response.text)
         return [
             Availability.from_dict(availability) for availability in all_availabilities
