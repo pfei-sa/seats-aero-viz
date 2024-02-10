@@ -7,7 +7,7 @@ import humanize
 import altair as alt
 import pandas as pd
 
-from seats_aero.api import Availability, PARTNERS, partner_to_display_name
+from seats_aero.api import Availability, PARTNERS, partner_to_display_name, Route
 from seats_aero.plot import get_route_df
 from seats_aero.airport import city_expansion_dict, country_expansion_dict
 from datetime import datetime as time
@@ -23,14 +23,16 @@ with st.sidebar:
         "Partners",
         PARTNERS,
         format_func=partner_to_display_name,
-        index=PARTNERS.index("lifemiles"),
+        index=PARTNERS.index("aeroplan"),
         label_visibility="hidden",
     )
 
 
 @st.cache_data(ttl=timedelta(minutes=15))
 def load_availabilities(partner: str) -> Tuple[List[Availability], datetime]:
-    return Availability.fetch(partner), time.now()
+    routes = Route.fetch()
+    route_map = {r.id: r for r in routes}
+    return Availability.fetch(route_map, partner), time.now()
 
 
 st.title("✈️Seats.areo Availability Visualizer")
