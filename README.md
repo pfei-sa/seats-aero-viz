@@ -21,3 +21,4 @@ Booking a multi-segment flight can be a pain. Checking the availability of seats
 - Clone the repo
 - Install the requirements using `poetry install`
 - Run the app using `streamlit run main.py`
+- Create file `.streamlit/secrets.toml` with `api_key = "YOUR_API_KEY"`
