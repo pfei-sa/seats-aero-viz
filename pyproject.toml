@@ -11,7 +11,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.10"
 pydantic = "^1.10.7"
-altair = "^4.2.2"
+altair = "^5"
 requests = "^2.28.2"
 pandas = "^1.5.3"
 streamlit = "^1.20.0"
@@ -20,9 +20,13 @@ airportsdata = "^20230323"
 
 
 [tool.poetry.group.dev.dependencies]
-ipykernel = "^6.22.0"
-black = "^23.3.0"
+ruff = "^0.2.1"
+pyright = "^1.1.350"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff.lint]
+# Enable the isort rules.
+extend-select = ["I"]

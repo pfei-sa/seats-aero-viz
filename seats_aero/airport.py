@@ -1,5 +1,4 @@
-
-'''
+"""
 **City Code Directory (CCD) – Multi Airport Cities list**
 
 .. list-table::
@@ -459,13 +458,12 @@
      - JNB
      - Johannesburg
      - JNB
-     - \O. R. Tambo International Airport
-'''
+     - O. R. Tambo International Airport
+"""
 
 import functools
-from typing import List, Dict
-import airportsdata
 
+import airportsdata
 
 CITY_TO_IATA = [
     ["DXB", "DWC"],
@@ -560,20 +558,22 @@ CITY_TO_IATA = [
     ["JNB", "JNB"],
 ]
 
+
 @functools.cache
-def city_expansion_dict() -> Dict[str, List[str]]:
+def city_expansion_dict() -> dict[str, list[str]]:
     """Return a dictionary mapping city names to a list of IATA codes."""
-    city_to_iata = {}
+    city_to_iata: dict[str, list[str]] = {}
     for city, airport in CITY_TO_IATA:
         if city not in city_to_iata:
             city_to_iata[city] = []
         city_to_iata[city].append(airport)
     return city_to_iata
 
+
 @functools.cache
-def country_expansion_dict() -> Dict[str, List[str]]:
+def country_expansion_dict() -> dict[str, list[str]]:
     """Return a dictionary mapping country names to a list of IATA codes."""
-    country_to_iata = {}
+    country_to_iata: dict[str, list[str]] = {}
     for code, airport in airportsdata.load("IATA").items():
         country = airport["country"]
         if country not in country_to_iata:

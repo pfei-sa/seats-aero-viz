@@ -1,16 +1,16 @@
 from datetime import datetime, timedelta
-from typing import List, Set, Tuple
-from itertools import product
-
-import streamlit as st
-import humanize
-import altair as alt
-import pandas as pd
-
-from seats_aero.api import Availability, PARTNERS, partner_to_display_name, Route
-from seats_aero.plot import get_route_df
-from seats_aero.airport import city_expansion_dict, country_expansion_dict
 from datetime import datetime as time
+from itertools import product
+from typing import List, Set, Tuple
+
+import altair as alt
+import humanize
+import pandas as pd
+import streamlit as st
+
+from seats_aero.airport import city_expansion_dict, country_expansion_dict
+from seats_aero.api import PARTNERS, Availability, Route, partner_to_display_name
+from seats_aero.plot import get_route_df
 
 st.set_page_config(
     page_title="Seats.aero Availability Visualizer",
@@ -19,12 +19,15 @@ st.set_page_config(
 
 with st.sidebar:
     st.title("Partners")
-    partner = st.radio(
-        "Partners",
-        PARTNERS,
-        format_func=partner_to_display_name,
-        index=PARTNERS.index("aeroplan"),
-        label_visibility="hidden",
+    partner = (
+        st.radio(
+            "Partners",
+            PARTNERS,
+            format_func=partner_to_display_name,
+            index=PARTNERS.index("aeroplan"),
+            label_visibility="hidden",
+        )
+        or "aeroplan"
     )
 
 
@@ -97,7 +100,7 @@ def canonicalize_route(
 def expand_route(
     route: List[Tuple[str, str]], expand_country: bool, expand_city: bool
 ) -> List[Tuple[str, str]]:
-    res = []
+    res: List[Tuple[str, str]] = []
     for org, dest in route:
         res.extend(
             product(
@@ -175,8 +178,10 @@ chart = (
             alt.datum.direct,
             alt.value(1),
             alt.value(0.5),
-        ),
-    ).properties(height=alt.Step(12)).interactive()
+        ), # type: ignore
+    )
+    .properties(height=alt.Step(12))
+    .interactive()
 )
 
 st.altair_chart(

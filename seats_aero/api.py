@@ -1,11 +1,10 @@
 import json
 from dataclasses import dataclass
 from datetime import datetime
-from functools import lru_cache
 from typing import Dict, List, Set
-from streamlit import secrets
 
 import requests
+from streamlit import secrets
 
 PARTNERS = [
     "aeroplan",
@@ -17,6 +16,7 @@ PARTNERS = [
     "etihad",
     "virginatlantic",
 ]
+
 
 def partner_to_display_name(partner: str) -> str:
     return {
@@ -63,9 +63,9 @@ class Route:
     @staticmethod
     def fetch() -> List["Route"]:
         url = "https://seats.aero/api/routes"
-        response = requests.get(url, headers={
-            "Partner-Authorization": secrets["api_key"]
-        })
+        response = requests.get(
+            url, headers={"Partner-Authorization": secrets["api_key"]}
+        )
         all_routes = json.loads(response.text)
         return [Route.from_dict(route) for route in all_routes]
 
@@ -160,7 +160,7 @@ class Availability:
     def airlines(self, code: str) -> str:
         raw = getattr(self, f"{code.lower()}_airlines")
         return raw if raw is not None else ""
-    
+
     def direct(self, code: str) -> bool:
         raw = getattr(self, f"{code.lower()}_direct")
         return raw if raw is not None else False
@@ -210,18 +210,17 @@ class Availability:
         )
 
     @staticmethod
-    def from_json(json_str: str) -> "Availability":
-        return Availability.from_dict(json.loads(json_str))
-
-    @staticmethod
-    def fetch(route_map: dict[str, Route], partner: str = "aeroplan") -> List["Availability"]:
+    def fetch(
+        route_map: dict[str, Route], partner: str = "aeroplan"
+    ) -> List["Availability"]:
         url = f"https://seats.aero/api/availability?source={partner}"
-        response = requests.get(url, headers={
-            "Partner-Authorization": secrets["api_key"]
-        })
+        response = requests.get(
+            url, headers={"Partner-Authorization": secrets["api_key"]}
+        )
         all_availabilities = json.loads(response.text)
         return [
-            Availability.from_dict(availability, route_map) for availability in all_availabilities
+            Availability.from_dict(availability, route_map)
+            for availability in all_availabilities
         ]
 
     def airline_str(self) -> str:
