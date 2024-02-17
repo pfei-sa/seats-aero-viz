@@ -66,6 +66,8 @@ class Route:
         response = requests.get(
             url, headers={"Partner-Authorization": secrets["api_key"]}
         )
+        if response.status_code != 200:
+            raise ValueError(f"Failed to fetch routes: {response.text}")
         all_routes = json.loads(response.text)
         return [Route.from_dict(route) for route in all_routes]
 
