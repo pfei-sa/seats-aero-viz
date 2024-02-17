@@ -3,11 +3,12 @@ from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
 from typing import Dict, List, Set
+from streamlit import secrets
 
 import requests
 
 PARTNERS = [
-    "lifemiles",
+    "aeroplan",
     "aeromexico",
     "american",
     "united",
@@ -19,7 +20,7 @@ PARTNERS = [
 
 def partner_to_display_name(partner: str) -> str:
     return {
-        "lifemiles": "LifeMiles",
+        "aeroplan": "Aeroplan",
         "aeromexico": "Aeromexico",
         "american": "American Airlines",
         "united": "United Airlines",
@@ -62,7 +63,9 @@ class Route:
     @staticmethod
     def fetch() -> List["Route"]:
         url = "https://seats.aero/api/routes"
-        response = requests.get(url)
+        response = requests.get(url, headers={
+            "Partner-Authorization": secrets["api_key"]
+        })
         all_routes = json.loads(response.text)
         return [Route.from_dict(route) for route in all_routes]
 
@@ -173,12 +176,12 @@ class Availability:
         return res
 
     @staticmethod
-    def from_dict(d: Dict) -> "Availability":
+    def from_dict(d: Dict, route_map: dict[str, Route]) -> "Availability":
         raw = d
         return Availability(
             id=raw["ID"],
             route_id=raw["RouteID"],
-            route=Route.from_dict(raw["Route"]),
+            route=route_map[raw["RouteID"]],
             date=raw["Date"],
             # parse from 2023-05-24T00:00:00Z to datetime
             parsed_date=datetime.strptime(raw["ParsedDate"], "%Y-%m-%dT%H:%M:%SZ"),
@@ -211,12 +214,14 @@ class Availability:
         return Availability.from_dict(json.loads(json_str))
 
     @staticmethod
-    def fetch(partner: str = "lifemiles") -> List["Availability"]:
+    def fetch(route_map: dict[str, Route], partner: str = "aeroplan") -> List["Availability"]:
         url = f"https://seats.aero/api/availability?source={partner}"
-        response = requests.get(url)
+        response = requests.get(url, headers={
+            "Partner-Authorization": secrets["api_key"]
+        })
         all_availabilities = json.loads(response.text)
         return [
-            Availability.from_dict(availability) for availability in all_availabilities
+            Availability.from_dict(availability, route_map) for availability in all_availabilities
         ]
 
     def airline_str(self) -> str:
