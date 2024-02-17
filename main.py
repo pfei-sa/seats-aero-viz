@@ -9,7 +9,7 @@ import pandas as pd
 import streamlit as st
 
 from seats_aero.airport import city_expansion_dict, country_expansion_dict
-from seats_aero.api import PARTNERS, Availability, Route, partner_to_display_name
+from seats_aero.api import Availability, Route, partners, partners_mapping
 from seats_aero.plot import get_route_df
 
 st.set_page_config(
@@ -17,18 +17,26 @@ st.set_page_config(
     page_icon=":airplane:",
 )
 
+st.title("✈️Seats.areo Availability Visualizer")
+
 with st.sidebar:
     st.title("Partners")
+    default_partner = st.query_params.get("partner", "aeroplan")
     partner = (
         st.radio(
             "Partners",
-            PARTNERS,
-            format_func=partner_to_display_name,
-            index=PARTNERS.index("aeroplan"),
+            partners,
+            format_func=partners_mapping.get,
             label_visibility="hidden",
         )
-        or "aeroplan"
+        or default_partner
     )
+    st.query_params["partner"] = partner
+
+
+default_route = st.query_params.get("route", "US - LHR - NYC, CA - HKG")
+route = st.text_input("Route", default_route, max_chars=300, key="route").upper()
+st.query_params["route"] = route
 
 
 @st.cache_data(ttl=timedelta(minutes=15))
@@ -37,8 +45,6 @@ def load_availabilities(partner: str) -> Tuple[List[Availability], datetime]:
     route_map = {r.id: r for r in routes}
     return Availability.fetch(route_map, partner), time.now()
 
-
-st.title("✈️Seats.areo Availability Visualizer")
 
 availabilities, cache_freshness = load_availabilities(partner)
 
@@ -53,10 +59,6 @@ for a in availabilities:
         all_airlines.update(
             f.strip() for f in a.airlines(fare).split(",") if f.strip() != ""
         )
-
-route = st.text_input(
-    "Route", "US - LHR - NYC, CA - HKG", max_chars=300, key="route"
-).upper()
 
 col1, col2, col3 = st.columns([3, 3, 2])
 
@@ -128,9 +130,11 @@ filtered_route = [
 
 route_df = get_route_df(availabilities, filtered_route, airlines, fares)
 
-st.caption(f"Data last refreshed {humanize.naturaldelta(time_since_cache)} ago")
+st.caption(
+    f"Fetched {humanize.intword(len(availabilities))} availabilities {humanize.naturaldelta(time_since_cache)} ago"
+)
 
-if len(filtered_route) == 0:
+if len(route_df) == 0:
     st.error("No route found")
     st.stop()
 
@@ -178,7 +182,7 @@ chart = (
             alt.datum.direct,
             alt.value(1),
             alt.value(0.5),
-        ), # type: ignore
+        ),  # type: ignore
     )
     .properties(height=alt.Step(12))
     .interactive()

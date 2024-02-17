@@ -6,29 +6,25 @@ from typing import Dict, List, Set
 import requests
 from streamlit import secrets
 
-PARTNERS = [
-    "aeroplan",
-    "aeromexico",
-    "american",
-    "united",
-    "delta",
-    "emirates",
-    "etihad",
-    "virginatlantic",
-]
+partners_mapping = {
+    "aeromexico": "Aeromexico",
+    "aeroplan": "Aeroplan",
+    "flyingblue": "Air France/KLM",
+    "alaska": "Alaska Airlines",
+    "american": "American Airlines",
+    "delta": "Delta Airlines",
+    "emirates": "Emirates",
+    "etihad": "Etihad",
+    "jetblue": "JetBlue",
+    "quantas": "Qantas",
+    "eurobonus": "SAS EuroBonus",
+    "united": "United Airlines",
+    "virginatlantic": "Virgin Atlantic",
+    "velocity": "Virgin Australia",
+}
 
 
-def partner_to_display_name(partner: str) -> str:
-    return {
-        "aeroplan": "Aeroplan",
-        "aeromexico": "Aeromexico",
-        "american": "American Airlines",
-        "united": "United Airlines",
-        "delta": "Delta Airlines",
-        "emirates": "Emirates",
-        "etihad": "Etihad",
-        "virginatlantic": "Virgin Atlantic",
-    }[partner]
+partners = sorted(partners_mapping.keys())
 
 
 @dataclass
