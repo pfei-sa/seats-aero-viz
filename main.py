@@ -21,7 +21,7 @@ st.title("✈️Seats.areo Availability Visualizer")
 
 with st.sidebar:
     st.title("Partners")
-    default_partner = st.query_params.get("partner", "aeroplan")
+    default_partner = "aeroplan"
     partner = (
         st.radio(
             "Partners",
@@ -31,12 +31,10 @@ with st.sidebar:
         )
         or default_partner
     )
-    st.query_params["partner"] = partner
 
 
-default_route = st.query_params.get("route", "US - LHR - NYC, CA - HKG")
+default_route = "US - LHR - NYC, CA - HKG"
 route = st.text_input("Route", default_route, max_chars=300, key="route").upper()
-st.query_params["route"] = route
 
 
 @st.cache_data(ttl=timedelta(minutes=15))
@@ -197,7 +195,7 @@ st.altair_chart(
 displayed_route = set(route_df["route"].unique())
 
 with st.expander("Raw data"):
-    st.table(route_df)
+    st.write(route_df)
 
 with st.expander("Route without availability"):
     st.write(
