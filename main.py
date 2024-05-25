@@ -17,7 +17,7 @@ st.set_page_config(
     page_icon=":airplane:",
 )
 
-st.title("✈️Seats.areo Availability Visualizer")
+st.title("✈️Seats.aero Availability Visualizer")
 
 with st.sidebar:
     st.title("Partners")

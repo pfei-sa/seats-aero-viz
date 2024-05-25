@@ -16,11 +16,13 @@ partners_mapping = {
     "emirates": "Emirates",
     "etihad": "Etihad",
     "jetblue": "JetBlue",
-    "quantas": "Qantas",
+    "qantas": "Qantas",
     "eurobonus": "SAS EuroBonus",
     "united": "United Airlines",
     "virginatlantic": "Virgin Atlantic",
     "velocity": "Virgin Australia",
+    "smiles": "GOL Smiles",
+    "azul": "Azul TodoAzul",
 }
 
 
