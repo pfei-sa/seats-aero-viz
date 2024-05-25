@@ -21,6 +21,8 @@ partners_mapping = {
     "united": "United Airlines",
     "virginatlantic": "Virgin Atlantic",
     "velocity": "Virgin Australia",
+    "smiles": "GOL Smiles",
+    "azul": "Azul TodoAzul",
 }
 
 
